@@ -14,9 +14,11 @@
       "backgroundColor": "#060813"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.replit.agonpreview"
     },
     "android": {
+      "package": "com.replit.agonpreview",
       "adaptiveIcon": {
         "foregroundImage": "./assets/andrik/logo.png",
         "backgroundColor": "#060813"
