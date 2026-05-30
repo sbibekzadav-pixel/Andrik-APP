@@ -1,45 +1,62 @@
-# [Project name]
+# Agon Preview — Andrik Game Zone
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A gaming center management system (session tracking, billing, inventory, customer CRM) built with Expo/React Native, targeting mobile and web.
 
 ## Run & Operate
 
+- `pnpm --filter @workspace/agon-preview run dev` — run the Expo dev server
 - `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
 - Required env: `DATABASE_URL` — Postgres connection string
 
 ## Stack
 
 - pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+- Mobile/Web: Expo SDK 54, React Native 0.81, Expo Router
+- Data sync: Firebase Realtime DB (`andrik-94bb6`) + AsyncStorage fallback + BroadcastChannel (web tabs)
+- Alarm: expo-av (native) / HTML5 Audio (web)
+- API: Express 5, PostgreSQL + Drizzle ORM
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/agon-preview/` — the Expo app
+- `artifacts/agon-preview/src/AppRoot.tsx` — monolithic app (4101 lines), all screens + state
+- `artifacts/agon-preview/src/types.ts` — all TypeScript types
+- `artifacts/agon-preview/src/theme.ts` — color palette and radius tokens
+- `artifacts/agon-preview/src/services/firebase.ts` — Firebase sync
+- `artifacts/agon-preview/src/services/apiSync.ts` — localStorage/AsyncStorage sync
+- `artifacts/agon-preview/src/utils/billing.ts` — session billing calculations
+- `artifacts/agon-preview/assets/andrik/` — app images
+- `.migration-backup/` — original Expo source backup
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- AppRoot manages all navigation as internal state (no Expo Router tabs in use)
+- `app/(tabs)/_layout.tsx` is a bare Stack passthrough — AppRoot renders its own bottom tab bar
+- Firebase sync is lazy-imported (dynamic import) to avoid bundler issues
+- expo-av alarm is lazy-imported for same reason; web uses HTML5 Audio directly
+- App uses dark gaming theme: bg `#060813`, cyan `#31d5c7`, yellow `#ffd347`
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+Gaming center command center for staff and admins:
+- **Stations** — start/stop/pause gaming sessions, live timers, billing by minute or hour
+- **Inventory** — food/drink stock management, per-item alerts
+- **Reports** — daily/weekly/monthly revenue, session history, item sales
+- **Settings** — stations, users (admin/staff), bulk discounts, billing mode
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+_Populate as you build._
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Do NOT add `reactCompiler` experiment to app.json — causes build issues
+- AppRoot is intentionally monolithic — don't split it without a plan
+- The Firebase config in firebase.ts is the real production config for Andrik
 
 ## Pointers
 
 - See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+- See `.agents/memory/agon-migration.md` for migration decisions

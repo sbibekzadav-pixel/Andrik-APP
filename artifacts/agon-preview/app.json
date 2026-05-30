@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "Agon Preview",
+    "slug": "agon-preview",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/andrik/logo.png",
+    "scheme": "agon-preview",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/andrik/logo.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#060813"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/andrik/logo.png",
+        "backgroundColor": "#060813"
+      }
+    },
+    "web": {
+      "favicon": "./assets/andrik/logo.png",
+      "backgroundColor": "#060813"
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "origin": "https://replit.com/"
+        }
+      ],
+      "expo-font",
+      "expo-web-browser",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow Agon to access your photos to set station and item images."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
