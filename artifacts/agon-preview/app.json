@@ -42,6 +42,15 @@
         {
           "photosPermission": "Allow Agon to access your photos to set station and item images."
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/andrik/logo.png",
+          "color": "#060813",
+          "defaultChannel": "agon-alerts",
+          "sounds": []
+        }
       ]
     ],
     "experiments": {

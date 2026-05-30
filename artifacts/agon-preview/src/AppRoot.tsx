@@ -27,6 +27,7 @@ import { seedData } from './data/seed';
 import { normalizePhotoUri, resolveBundledImageKey } from './utils/images';
 import { configureAlarms, ringAlarm, scheduleSessionAlarm, stopAlarm } from './services/alarm';
 import { setupRunningChannel, updateRunningNotification } from './services/foregroundService';
+import { parseDeepLink, registerForPushNotifications, sendLocalNotification } from './services/notifications';
 import {
   firebaseAuthErrorMessage,
   firebaseChangePassword,
@@ -486,6 +487,7 @@ function GameZoneApp() {
   // ── Initial load + local/api subscription ──────────────────────────────────
   useEffect(() => {
     configureAlarms().catch(() => undefined);
+    registerForPushNotifications().catch(() => undefined);
     AsyncStorage.getItem(AUTH_KEY).then((stored) => stored && setUser(JSON.parse(stored) as UserProfile));
 
     const syncId = BUSINESS_SYNC_ID;
@@ -594,6 +596,12 @@ function GameZoneApp() {
         if (!currentSession || currentSession.status !== 'running' || !currentSession.limitMinutes) return current;
         const limitMs = currentSession.limitMinutes * 60000;
         if (!currentSession.alarmSilenced) ringAlarm().catch(() => undefined);
+        const stationName = current.stations[currentSession.stationId]?.name ?? 'Station';
+        sendLocalNotification(
+          '⏰ Session Time Up',
+          `${stationName} — session limit reached. Tap to view.`,
+          { deepLink: `agon-preview://stations/${currentSession.stationId}` },
+        ).catch(() => undefined);
         return {
           ...current,
           sessions: {
@@ -616,6 +624,79 @@ function GameZoneApp() {
       });
     });
   }, [clock, commit, data.sessions]);
+
+  // ── Inventory low-stock push notification ───────────────────────────────────
+  const prevStockRef = useRef<Record<string, number>>({});
+  useEffect(() => {
+    const inventory = data.inventory ?? {};
+    Object.values(inventory).forEach((item) => {
+      const prev = prevStockRef.current[item.id];
+      const isNowLow = item.stock <= item.alertAt;
+      const wasOkBefore = prev === undefined || prev > item.alertAt;
+      if (isNowLow && wasOkBefore) {
+        sendLocalNotification(
+          '📦 Low Stock Alert',
+          `${item.name} is running low (${item.stock} remaining).`,
+          { deepLink: 'agon-preview://inventory' },
+        ).catch(() => undefined);
+      }
+      prevStockRef.current[item.id] = item.stock;
+    });
+  }, [data.inventory]);
+
+  // ── Deep link + notification tap handler ────────────────────────────────────
+  const dataRef = useRef(data);
+  dataRef.current = data;
+
+  const navigateDeepLink = useCallback((url: string) => {
+    const target = parseDeepLink(url);
+    if (!target) return;
+    setTab(target.tab);
+    if (target.tab === 'stations' && target.stationId) {
+      const station = dataRef.current.stations[target.stationId];
+      if (station) setSelectedStation(station);
+    }
+  }, []);
+
+  useEffect(() => {
+    let Linking: typeof import('expo-linking') | null = null;
+    let subscription: { remove: () => void } | null = null;
+
+    const init = async () => {
+      try {
+        Linking = await import('expo-linking');
+        const initial = await Linking.getInitialURL();
+        if (initial) navigateDeepLink(initial);
+        subscription = Linking.addEventListener('url', ({ url }) => navigateDeepLink(url));
+      } catch {
+        // expo-linking unavailable
+      }
+    };
+    init().catch(() => undefined);
+
+    return () => { subscription?.remove(); };
+  }, [navigateDeepLink]);
+
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    let Notifications: typeof import('expo-notifications') | null = null;
+    let sub: { remove: () => void } | null = null;
+
+    const init = async () => {
+      try {
+        Notifications = await import('expo-notifications') as typeof import('expo-notifications');
+        sub = Notifications.addNotificationResponseReceivedListener((response) => {
+          const deepLink = response.notification.request.content.data?.deepLink as string | undefined;
+          if (deepLink) navigateDeepLink(deepLink);
+        });
+      } catch {
+        // expo-notifications unavailable
+      }
+    };
+    init().catch(() => undefined);
+
+    return () => { sub?.remove(); };
+  }, [navigateDeepLink]);
 
   const runningCount = Object.values(data.stations ?? {}).filter((station) => station.status === 'running' || station.status === 'alarm' || station.status === 'paused').length;
   const activeSession = activeSessionId ? data.sessions[activeSessionId] : null;
