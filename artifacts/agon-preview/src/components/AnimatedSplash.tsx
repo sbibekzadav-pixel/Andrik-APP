@@ -4,6 +4,7 @@ import {
   Dimensions,
   Easing,
   Image,
+  Platform,
   StyleSheet,
   View,
 } from 'react-native';
@@ -185,7 +186,7 @@ export function AnimatedSplash({ onFinish }: Props) {
         >
           <View style={styles.logoInner}>
             <Image
-              source={require('../assets/andrik/logo.png')}
+              source={require('../../assets/andrik/logo.png')}
               style={styles.logoImage}
               resizeMode="cover"
             />
@@ -266,10 +267,11 @@ const styles = StyleSheet.create({
     width: W * 1.2,
     height: 3,
     backgroundColor: '#31d5c7',
-    shadowColor: '#31d5c7',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 1,
-    shadowRadius: 18,
+    ...Platform.select({
+      ios: { shadowColor: '#31d5c7', shadowOffset: { width: 0, height: 0 }, shadowOpacity: 1, shadowRadius: 18 },
+      android: { elevation: 8 },
+      web: { boxShadow: '0 0 18px #31d5c7' },
+    }),
   },
   textBlock: {
     position: 'absolute',

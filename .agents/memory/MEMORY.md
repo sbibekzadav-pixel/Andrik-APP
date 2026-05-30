@@ -1,1 +1,1 @@
-- [Agon Preview migration](agon-migration.md) — Expo/RN app migrated from .migration-backup/ into artifacts/agon-preview/; all source in src/ subdirectory
+- [Agon app shell decisions](agon-shell.md) — key decisions for Expo Router entry, auth, and assets
