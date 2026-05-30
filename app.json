@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "Agon Preview",
+    "slug": "agon-preview",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/andrik/logo.png",
+    "scheme": "andrik",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#060813",
+    "splash": {
+      "backgroundColor": "#060813"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.andrik.gamezone"
+    },
+    "android": {
+      "package": "com.andrik.gamezone",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/andrik/logo.png",
+        "backgroundColor": "#060813"
+      }
+    },
+    "web": {
+      "favicon": "./assets/andrik/logo.png",
+      "backgroundColor": "#060813"
+    },
+    "platforms": [
+      "ios",
+      "android",
+      "web"
+    ],
+    "plugins": [
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#060813"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "552f0665-e30d-4f11-9ea9-97bc22a22809"
+      }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/552f0665-e30d-4f11-9ea9-97bc22a22809"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "owner": "arcadalabs"
+  }
+}
