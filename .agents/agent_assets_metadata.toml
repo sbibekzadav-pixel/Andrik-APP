@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "UWoWiJgHkiteISuDii9Bv"
+uri = "file://agon-preview.zip"
+type = "unspecified"
+title = "Agon Preview — Full Source Code (8.7 MB)"
