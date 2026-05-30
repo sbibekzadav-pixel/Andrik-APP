@@ -42,12 +42,24 @@ async function getDB(): Promise<unknown> {
   }
 }
 
-export async function firebaseSignIn(_email: string, _password: string) { return null; }
-export function firebaseCreateAuthErrorMessage(_error: unknown): string { return ''; }
-export function firebaseAuthErrorMessage(_error: unknown): string { return ''; }
+export async function firebaseSignIn(_email: string, _password: string): Promise<never> {
+  throw Object.assign(new Error('NO_AUTH'), { code: 'auth/no-firebase-auth' });
+}
+export function firebaseCreateAuthErrorMessage(error: unknown): string {
+  const msg = (error as Error)?.message ?? '';
+  if (msg === 'NO_AUTH') return '';
+  return msg || 'Account creation failed.';
+}
+export function firebaseAuthErrorMessage(error: unknown): string {
+  const msg = (error as Error)?.message ?? '';
+  if (msg === 'NO_AUTH') return 'Online login unavailable — using local password.';
+  return msg || 'Authentication failed.';
+}
 export async function firebaseCreateUser(_email: string, _password: string): Promise<null> { return null; }
 export async function firebaseSignOut(): Promise<void> { return; }
-export async function firebaseChangePassword(_e: string, _c: string, _n: string): Promise<void> { return; }
+export async function firebaseChangePassword(_e: string, _c: string, _n: string): Promise<never> {
+  throw Object.assign(new Error('NO_AUTH'), { code: 'auth/no-firebase-auth' });
+}
 
 export async function loadBusiness(syncId?: string): Promise<BusinessData | null> {
   try {
