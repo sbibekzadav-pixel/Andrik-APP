@@ -2702,9 +2702,11 @@ const styles = StyleSheet.create({
   },
   cardActive: {
     borderColor: colors.borderStrong,
-    shadowColor: colors.cyan,
-    shadowOpacity: 0.16,
-    shadowRadius: 12,
+    ...Platform.select({
+      ios: { shadowColor: colors.cyan, shadowOpacity: 0.16, shadowRadius: 12 },
+      android: { elevation: 4 },
+      web: { boxShadow: `0 0 12px ${colors.cyan}29` },
+    }),
   },
   pressed: {
     opacity: 0.82,
